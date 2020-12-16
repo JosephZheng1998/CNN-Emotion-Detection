@@ -28,4 +28,13 @@ It is recommended to run `Final_Project_Ensemble.ipynb` on Google Colab to run o
 - Testing Accuracy: 74.0%
 
 ## CNN Autoencoders
-run 10701_Final_Project.ipynb in Google colab to run our CNN Autoencoder model
+run 10701_Final_Project.ipynb in the autoencoder folder in Google colab to run our CNN Autoencoder model
+
+## Best Autoencoder
+Architecture: please refer to the paper
+Testing Accuracy: 67.5%
+
+## Hyperparameters
+- optimizer: Adam() - lr=1e-3;
+- criterion: CrossEntropyLoss() & MSEloss()
+- scheduler: ReduceLROnPlateau() - factor=0.75; patience=2
