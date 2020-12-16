@@ -27,3 +27,5 @@ It is recommended to run `Final_Project_Ensemble.ipynb` on Google Colab to run o
 - Included models: ['ResNeXt101', 'Wide_ResNet101', 'DenseNet161', 'DenseNet201', 'Wide_ResNet50', 'DenseNet169', 'ResNet34', 'DenseNet121', 'ResNeXt50', 'ResNet50', 'ResNet152', 'ResNet101', 'ResNet18']
 - Testing Accuracy: 74.0%
 
+## CNN Autoencoders
+run 10701_Final_Project.ipynb in Google colab to run our CNN Autoencoder model
