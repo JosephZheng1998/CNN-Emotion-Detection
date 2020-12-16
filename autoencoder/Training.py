@@ -604,3 +604,59 @@ def validate_class(model, val_loader, criterion, device):
             del preds
             torch.cuda.empty_cache()
     return running_class_loss/total, correct/total
+
+if __name__ == '__main__':
+    splitfolders.ratio('test', output='val_test', seed=1337, ratio=(0, 0.5, 0.5), group_prefix=None)
+
+    # check for GPU
+    cuda = torch.cuda.is_available()
+    device = torch.device('cuda' if cuda else 'cpu')
+    print(device)
+
+    train_loader, dev_loader, test_loader = preprocessing()
+
+    """# Dimensionality Reduction """
+
+    model = AutoClassifier()
+    model.to(device)
+
+    criterion = nn.MSELoss()
+    epochs = 80
+    optimizer = torch.optim.Adam(model.parameters(), lr=5e-2)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.75, patience=2, verbose=True)
+
+    # train the encoder and decoder
+    pre_train_loss, pre_val_loss = pretrain(model, train_loader, dev_loader, criterion, optimizer, scheduler, epochs, device)
+
+    make_plots(pre_train_loss, pre_val_loss, "Autoencoder", "Loss")
+
+    #compare the reconstructed image with the original image
+    fixed_x = train_dataset[random.randint(1,100)][0].unsqueeze(0).to(device)
+    compare_x = compare(fixed_x)
+
+    save_image(compare_x.data.cpu(), 'sample_image.png')
+    display(Image('sample_image.png', width=700, unconfined=True))
+
+    class_criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.75, patience=2, verbose=True)
+    epoch = 80
+
+    train_class_losses, train_accs, val_class_losses, val_accs = train_class(model, train_loader, dev_loader, class_criterion, optimizer, scheduler, epochs, device)
+
+    make_plots(train_accs, val_accs, "Classifier", "Accuracy")
+
+    """# Train and Test the Multitasking Model"""
+
+    model = AutoClassifier()
+    model.to(device)
+
+    recon_criterion = nn.MSELoss()
+    class_criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.75, patience=2, verbose=True)
+    epochs = 100
+
+    train_recon_losses, train_class_losses, train_accs, val_class_losses, val_recon_losses, val_accs = train(model, train_loader, dev_loader, recon_criterion, class_criterion, optimizer, scheduler, epochs, device)
+
+    _, _, test_acc = validate(model, test_loader, recon_criterion, class_criterion, device)
