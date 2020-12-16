@@ -76,6 +76,7 @@ if __name__ == '__main__':
 
     empty_cache = True
 
+    # change this to train other SOTA CNNs
     model_name = 'DenseNet121'
     model = models.densenet121(pretrained=True)
     model.classifier = nn.Linear(1024, num_classes)
